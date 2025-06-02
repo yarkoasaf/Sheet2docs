@@ -79,9 +79,3 @@ To embed images:
 2. **Key limitations**:  
    - Images don't auto-resize  
    - Oversized/small images may disrupt formatting  
-
----
-
-> **Correction Applied**:  
-> - Changed "Column A" to "First row" for keywords in both versions  
-> - Clarified spreadsheet structure uses first row as header  

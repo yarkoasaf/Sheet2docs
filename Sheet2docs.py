@@ -40,11 +40,11 @@ first_row = next(ws.iter_rows(min_row=1, max_row=1, values_only=True))
 
 headers = list(filter(lambda x: x is not None, first_row))
 
+#conuter files saved
+files_saved = 0
+
 # Iterate through each row in Excel (skip the header row)
 for row in ws.iter_rows(min_row=2, values_only=True):  # min_row=2 skips the header
-
-    #conuter files saved
-    files_saved = 0
 
     # Load the Word template
     doc = Document(template_path)
@@ -64,6 +64,23 @@ for row in ws.iter_rows(min_row=2, values_only=True):  # min_row=2 skips the hea
                     #doc.add_picture(row[indexHeader])
                 else:
                     paragraph.text = paragraph.text.replace(f'<<{header}>>', str(row[indexHeader]))
+
+    # Also replace placeholders in tables
+    for table in doc.tables:
+        for row_cells in table.rows:
+            for cell in row_cells.cells:
+                for paragraph in cell.paragraphs:
+                    for header in headers:
+                        if f'<<{header}>>' in paragraph.text:
+                            indexHeader = headers.index(header)
+                            if row[indexHeader] is None or row[indexHeader] == '':
+                                paragraph.text = paragraph.text.replace(f'<<{header}>>', ' ')
+                            elif "img" in header:
+                                paragraph.text = paragraph.text.replace(f'<<{header}>>', '')
+                                run = paragraph.add_run()
+                                run.add_picture(row[indexHeader])
+                            else:
+                                paragraph.text = paragraph.text.replace(f'<<{header}>>', str(row[indexHeader]))
 
     # Save the document with a custom name
     output_path = template_path.replace("template", "").strip().replace(" ", "_")
@@ -87,5 +104,5 @@ for row in ws.iter_rows(min_row=2, values_only=True):  # min_row=2 skips the hea
     print(f'Saved: {output_path}')
     files_saved += 1
 
-input(files_saved + " documents generated successfully!")
+input(str(files_saved) + " documents generated successfully!")
 
